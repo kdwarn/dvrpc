@@ -40,7 +40,7 @@ def count(record_num, sql_query=sql_query):
     if request.method == 'PUT':
         if not request.data:
             return jsonify({"error": "No Request body submitted"})
-        
+
         if not request.is_json:
             return jsonify({"error": "Request body must be submitted in json format"})
 
@@ -56,49 +56,57 @@ def count(record_num, sql_query=sql_query):
 
         # check for unknown parameters, parameter type, parameter content
         unknown_parameters = []
-        wrong_types = []
+        bad_params = []
         type_int = ['ObjectID', 'SETYear', 'MCD', 'Route', 'Factor', 'AADB']
         type_float = ['X', 'Y', 'Latitude', 'Longitude', 'Axle']
         type_datetime = ['SETDate', 'Updated']
-        type_string = ['Road', 
+        type_string = ['Road',
                        'FromLmt',
                        'ToLmt',
                        'Type',
-                       'Co_name',
                        'Mun_name',
                        'Program',
                        'BikePedGro',
                        'BikePedFac']
         cnt_dir = ['both, east, west, north, south']
         in_out_dir = ['E', 'W', 'N', 'S']
+        counties = ['Bucks',
+                    'Chester',
+                    'Delaware',
+                    'Montgomery',
+                    'Philadelphia',
+                    'Burlington',
+                    'Camden',
+                    'Gloucester',
+                    'Mercer']
         
         for k, v in params.items():
             if k not in field_names:
                 unknown_parameters.append(k)
-            if k in type_int:
-                if type(v) != 'int':
-                    wrong_types.append(k + " must be an integer")
-            if k in type_float:
-                if type(v) != 'float':
-                    wrong_types.append(k + " must be a float")
-            if k in type_datetime:
-                if type(v) != 'datetime':
-                    wrong_types.append(k + " must be in datetime ISO format")
-            if k in type_string:
-                if type(v) != 'string':
-                    wrong_types.append(k + " must be text")
+            if k in type_int and type(v) is not int:
+                bad_params.append(k + " must be an integer")
+            if k in type_float and type(v) is not float:
+                bad_params.append(k + " must be a float")
+            if k in type_datetime and type(v) is not datetime:
+                bad_params.append(k + " must be in datetime ISO format")
+            if k in type_string and type(v) is not str:
+                bad_params.append(k + " must be text")
             if k == 'CntDir' and v not in cnt_dir:
-                wrong_types.append(k + " must be one of 'both', 'east', 'west', 'north', or 'south'")
+                bad_params.append(k + " must be one of " + ", ".join(cnt_dir))
             if k in ['InDir', 'OutDir'] and v not in in_out_dir:
-                wrong_types.append(k + " must be one of 'E', 'W', 'N', or 'S'")
+                bad_params.append(k + " must be one of " + ", ".join(in_out_dir))
+            if k == 'Co_name' and v not in counties:
+                bad_params.append(k + " must be one of " + ", ".join(counties))
+
+            # Other checks would go here (Co_name, Mun_name, etc.)
 
         if unknown_parameters:
-            return jsonify({"error": "Unknown parameters submitted: "
+            return jsonify({"error": "Unknown parameter(s) submitted: "
                             + ", ".join(unknown_parameters)})
 
-        if wrong_types:
-            return jsonify({"error": "Submitted parameters are not the correct type: "
-                            + "; ".join(wrong_types)})
+        if bad_params:
+            return jsonify({"error": "Error(s) in submitted parameters: "
+                            + "; ".join(bad_params)})
         
         return jsonify(field_names)
 

@@ -14,7 +14,7 @@ CREATE TABLE bicycle_count (
     MCD INT,
     Route INT,
     Road TEXT,
-    CntDir CHAR(4),
+    CntDir CHAR(5),
     FromLmt TEXT,
     ToLmt TEXT,
     Type TEXT,
