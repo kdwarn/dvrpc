@@ -5,6 +5,7 @@ import decimal
 from flask import request, Blueprint, Response, jsonify
 from sqlalchemy import text
 from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.inspection import inspect
 
 from bicycles import db
 from .models import BicycleCount
@@ -37,7 +38,69 @@ def count(record_num, sql_query=sql_query):
             return jsonify({"error": "No matching record found."})
 
     if request.method == 'PUT':
-        pass
+        if not request.data:
+            return jsonify({"error": "No Request body submitted"})
+        
+        if not request.is_json:
+            return jsonify({"error": "Request body must be submitted in json format"})
+
+        # get user-submitted parameters (body)
+        params = request.get_json()
+
+        if not params:
+            return jsonify({"error": "No parameters submitted."})
+
+        # get list of fields in database
+        table = inspect(BicycleCount)
+        field_names = [field.name for field in table.c]
+
+        # check for unknown parameters, parameter type, parameter content
+        unknown_parameters = []
+        wrong_types = []
+        type_int = ['ObjectID', 'SETYear', 'MCD', 'Route', 'Factor', 'AADB']
+        type_float = ['X', 'Y', 'Latitude', 'Longitude', 'Axle']
+        type_datetime = ['SETDate', 'Updated']
+        type_string = ['Road', 
+                       'FromLmt',
+                       'ToLmt',
+                       'Type',
+                       'Co_name',
+                       'Mun_name',
+                       'Program',
+                       'BikePedGro',
+                       'BikePedFac']
+        cnt_dir = ['both, east, west, north, south']
+        in_out_dir = ['E', 'W', 'N', 'S']
+        
+        for k, v in params.items():
+            if k not in field_names:
+                unknown_parameters.append(k)
+            if k in type_int:
+                if type(v) != 'int':
+                    wrong_types.append(k + " must be an integer")
+            if k in type_float:
+                if type(v) != 'float':
+                    wrong_types.append(k + " must be a float")
+            if k in type_datetime:
+                if type(v) != 'datetime':
+                    wrong_types.append(k + " must be in datetime ISO format")
+            if k in type_string:
+                if type(v) != 'string':
+                    wrong_types.append(k + " must be text")
+            if k == 'CntDir' and v not in cnt_dir:
+                wrong_types.append(k + " must be one of 'both', 'east', 'west', 'north', or 'south'")
+            if k in ['InDir', 'OutDir'] and v not in in_out_dir:
+                wrong_types.append(k + " must be one of 'E', 'W', 'N', or 'S'")
+
+        if unknown_parameters:
+            return jsonify({"error": "Unknown parameters submitted: "
+                            + ", ".join(unknown_parameters)})
+
+        if wrong_types:
+            return jsonify({"error": "Submitted parameters are not the correct type: "
+                            + "; ".join(wrong_types)})
+        
+        return jsonify(field_names)
 
     if request.method == 'DELETE':
         pass
