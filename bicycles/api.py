@@ -272,7 +272,7 @@ def counts(sql_query=sql_query):
         db.session.add(BicycleCount(**params))
         db.session.commit()
 
-        return jsonify({"Success"})
+        return jsonify({"Success": "New count inserted."})
         
 
 

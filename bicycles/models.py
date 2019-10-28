@@ -7,9 +7,9 @@ class BicycleCount(db.Model):
     RecordNum = db.Column(db.Integer, primary_key=True)
     SETDate = db.Column(db.DateTime)
     SETYear = db.Column(db.Integer)
-    Comments = db.Column(db.Text)
+    Comments = db.Column(db.Text, nullable=False, default='')
     MCD = db.Column(db.BigInteger)
-    Route = db.Column(db.Integer)
+    Route = db.Column(db.Integer, nullable=False, default=0)
     Road = db.Column(db.Text)
     CntDir = db.Column(db.String(4))
     FromLmt = db.Column(db.Text)
@@ -26,9 +26,9 @@ class BicycleCount(db.Model):
     Co_name = db.Column(db.Text)
     Mun_name = db.Column(db.Text)
     GlobalID = db.Column(db.Text)
-    Program = db.Column(db.Text)
+    Program = db.Column(db.Text, nullable=False, default='')
     BikePedGro = db.Column(db.Text)
-    BikePedFac = db.Column(db.Text)
+    BikePedFac = db.Column(db.Text, nullable=False, default='')
 
 
 class Weather(db.Model):
