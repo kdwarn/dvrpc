@@ -21,6 +21,64 @@ def alchemyencoder(obj):
         return float(obj)
 
 
+def check_params(params):
+    # list of fields in database
+    table = inspect(BicycleCount)
+    field_names = [field.name for field in table.c]
+
+    # check for unknown parameters, parameter type, parameter content
+    unknown_params = []
+    bad_params = []
+    type_int = ['ObjectID', 'SETYear', 'MCD', 'Route', 'Factor', 'AADB']
+    type_float = ['X', 'Y', 'Latitude', 'Longitude']
+    type_datetime = ['SETDate', 'Updated']
+    type_string = ['Road',
+                   'FromLmt',
+                   'ToLmt',
+                   'Type',
+                   'Mun_name',
+                   'Program',
+                   'BikePedGro',
+                   'BikePedFac']
+    cnt_dir = ['both', 'east', 'west', 'north', 'south']
+    axle = [0, 1, 1.02]
+    in_out_dir = ['E', 'W', 'N', 'S']
+    counties = ['Bucks',
+                'Chester',
+                'Delaware',
+                'Montgomery',
+                'Philadelphia',
+                'Burlington',
+                'Camden',
+                'Gloucester',
+                'Mercer']
+    
+    for k, v in params.items():
+        if k not in field_names:
+            unknown_params.append(k)
+
+        if k in type_int and type(v) is not int:
+            bad_params.append(k + " must be an integer")
+        if k in type_float and type(v) is not float:
+            bad_params.append(k + " must be a float")
+        if k in type_datetime and type(v) is not datetime:
+            bad_params.append(k + " must be in datetime ISO format")
+        if k in type_string and type(v) is not str:
+            bad_params.append(k + " must be text")
+        if k == 'CntDir' and v not in cnt_dir:
+            bad_params.append(k + " must be one of " + ", ".join(cnt_dir))
+        if k == 'Axle' and v not in axle:
+            bad_params.append(k + " must be one of " + ", ".join(str(n) for n in axle))
+        if k in ['InDir', 'OutDir'] and v not in in_out_dir:
+            bad_params.append(k + " must be one of " + ", ".join(in_out_dir))
+        if k == 'Co_name' and v not in counties:
+            bad_params.append(k + " must be one of " + ", ".join(counties))
+
+        # Other checks would go here (Mun_name, etc.)
+
+    return bad_params, unknown_params
+
+
 sql_query = ("SELECT b.*, w.prcp, w.tavg, w.tmax, w.tmin FROM bicycle_count b LEFT JOIN weather "
              "w ON DATE(b.setdate) = w.date")
 
@@ -50,65 +108,17 @@ def count(record_num, sql_query=sql_query):
         if not params:
             return jsonify({"error": "No parameters submitted."})
 
-        # get list of fields in database
-        table = inspect(BicycleCount)
-        field_names = [field.name for field in table.c]
+        unknown_params, bad_params = check_params(params)
 
-        # check for unknown parameters, parameter type, parameter content
-        unknown_parameters = []
-        bad_params = []
-        type_int = ['ObjectID', 'SETYear', 'MCD', 'Route', 'Factor', 'AADB']
-        type_float = ['X', 'Y', 'Latitude', 'Longitude', 'Axle']
-        type_datetime = ['SETDate', 'Updated']
-        type_string = ['Road',
-                       'FromLmt',
-                       'ToLmt',
-                       'Type',
-                       'Mun_name',
-                       'Program',
-                       'BikePedGro',
-                       'BikePedFac']
-        cnt_dir = ['both, east, west, north, south']
-        in_out_dir = ['E', 'W', 'N', 'S']
-        counties = ['Bucks',
-                    'Chester',
-                    'Delaware',
-                    'Montgomery',
-                    'Philadelphia',
-                    'Burlington',
-                    'Camden',
-                    'Gloucester',
-                    'Mercer']
-        
-        for k, v in params.items():
-            if k not in field_names:
-                unknown_parameters.append(k)
-            if k in type_int and type(v) is not int:
-                bad_params.append(k + " must be an integer")
-            if k in type_float and type(v) is not float:
-                bad_params.append(k + " must be a float")
-            if k in type_datetime and type(v) is not datetime:
-                bad_params.append(k + " must be in datetime ISO format")
-            if k in type_string and type(v) is not str:
-                bad_params.append(k + " must be text")
-            if k == 'CntDir' and v not in cnt_dir:
-                bad_params.append(k + " must be one of " + ", ".join(cnt_dir))
-            if k in ['InDir', 'OutDir'] and v not in in_out_dir:
-                bad_params.append(k + " must be one of " + ", ".join(in_out_dir))
-            if k == 'Co_name' and v not in counties:
-                bad_params.append(k + " must be one of " + ", ".join(counties))
-
-            # Other checks would go here (Co_name, Mun_name, etc.)
-
-        if unknown_parameters:
+        if unknown_params:
             return jsonify({"error": "Unknown parameter(s) submitted: "
-                            + ", ".join(unknown_parameters)})
+                            + ", ".join(unknown_params)})
 
         if bad_params:
             return jsonify({"error": "Error(s) in submitted parameters: "
                             + "; ".join(bad_params)})
-        
-        return jsonify(field_names)
+
+        return "No errors"
 
     if request.method == 'DELETE':
         pass
