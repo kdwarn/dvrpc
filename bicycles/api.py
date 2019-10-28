@@ -96,30 +96,30 @@ def count(record_num, sql_query=sql_query):
             serialized = json.dumps([dict(r) for r in result], default=alchemyencoder)
             return Response(serialized, mimetype='application/json')
         else:
-            return jsonify({"error": "No matching record found."})
+            return jsonify({"error": "No matching record found."}), 404
 
     if request.method == 'PUT':
         if not request.data:
-            return jsonify({"error": "No Request body submitted"})
+            return jsonify({"error": "No Request body submitted"}), 400
 
         if not request.is_json:
-            return jsonify({"error": "Request body must be submitted in json format"})
+            return jsonify({"error": "Request body must be submitted in json format"}), 400
 
         # get user-submitted parameters (body)
         params = request.get_json()
 
         if not params:
-            return jsonify({"error": "No parameters submitted."})
+            return jsonify({"error": "No parameters submitted."}), 400
 
         unknown_params, bad_params = check_params(params)
 
         if unknown_params:
             return jsonify({"error": "Unknown parameter(s) submitted: "
-                            + ", ".join(unknown_params)})
+                            + ", ".join(unknown_params)}), 400
 
         if bad_params:
             return jsonify({"error": "Error(s) in submitted parameters: "
-                            + "; ".join(bad_params)})
+                            + "; ".join(bad_params)}), 400
 
         return "No errors"
 
@@ -151,7 +151,7 @@ def counts(sql_query=sql_query):
                 precipitation = float(precipitation)
             except ValueError:
                 return jsonify({'error': 'Precipitation value must be an number, with optional '
-                                'decimal points.'})
+                                'decimal points.'}), 400
             
             where_clauses.append(f"w.prcp >= {precipitation}")
         
@@ -164,9 +164,8 @@ def counts(sql_query=sql_query):
                               'Buffered Bike Lane',
                               'Sharrow']
             if facility not in facility_types:
-                return jsonify({'error': 'Facility must be one of ' + 
-                                         ', '.join(facility_types[:-1]) + 
-                                         ', or ' + facility_types[-1] + '.'})
+                return jsonify({'error': 'Facility must be one of '
+                                          + ', '.join(facility_types)}), 400
             where_clauses.append(f"b.bikepedfac = '{facility}'")
 
         if where_clauses:
@@ -180,7 +179,7 @@ def counts(sql_query=sql_query):
             serialized = json.dumps([dict(r) for r in result], default=alchemyencoder)
             return Response(serialized, mimetype='application/json')
         else:
-            return jsonify({"error": "No matching records found."})
+            return jsonify({"error": "No matching records found."}), 404
 
     if request.method == 'POST':
         pass
@@ -194,7 +193,7 @@ def facilities():
     try:
         result = db.session.query(BicycleCount.BikePedFac).distinct().all()
     except NoResultFound:
-        return jsonify({"error": "No facilities found."})
+        return jsonify({"error": "No facilities found."}), 404
 
     result = [row[0] for row in result if row[0]]
     return jsonify(result)
