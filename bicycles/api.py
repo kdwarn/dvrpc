@@ -1,6 +1,7 @@
 import json
 import datetime
 import decimal
+import uuid
 
 from flask import request, Blueprint, Response, jsonify
 from sqlalchemy import text
@@ -21,6 +22,41 @@ def alchemyencoder(obj):
         return float(obj)
 
 
+def check_required_fields(params):
+    '''When creating a new count, check params submitted against required fields.'''
+    # assumed required_params based on sample of counts without missing values, excluding
+    # "RecordNum", "Updated", and "GlobalID"
+    required_fields = ['X',
+                       'Y',
+                       'ObjectID',
+                       'SETDate',
+                       'SETYear',
+                       'MCD',
+                       'Road',
+                       'CntDir',
+                       'FromLmt',
+                       'ToLmt',
+                       'Type',
+                       'Latitude',
+                       'Longitude',
+                       'Factor',
+                       'Axle',
+                       'OutDir',
+                       'InDir',
+                       'AADB',
+                       'Co_name',
+                       'Mun_name',
+                       'BikePedGro',
+    ]
+
+    missing_params = []
+
+    for field in required_fields:
+        if field not in params.keys():
+            missing_params.append(field)
+    
+    return missing_params
+
 def check_params(params):
     '''
     Check user-submitted parameters, in PUT and POST requests, against allowed parameters,
@@ -34,7 +70,6 @@ def check_params(params):
 
     type_int = ['ObjectID', 'SETYear', 'MCD', 'Route', 'Factor', 'AADB']
     type_float = ['X', 'Y', 'Latitude', 'Longitude']
-    type_datetime = ['SETDate', 'Updated']
     type_string = ['Road',
                    'FromLmt',
                    'ToLmt',
@@ -42,7 +77,8 @@ def check_params(params):
                    'Mun_name',
                    'Program',
                    'BikePedGro',
-                   'BikePedFac']
+                   'BikePedFac',
+    ]
     cnt_dir = ['both', 'east', 'west', 'north', 'south']
     axle = [0, 1, 1.02]
     in_out_dir = ['E', 'W', 'N', 'S']
@@ -54,20 +90,23 @@ def check_params(params):
                 'Burlington',
                 'Camden',
                 'Gloucester',
-                'Mercer']
-    
+                'Mercer',
+    ]
+
+    # check for unknown parameters and parameter type/content
     for k, v in params.items():
         if k not in field_names:
             unknown_params.append(k)
 
+        # check types
         if k in type_int and type(v) is not int:
             bad_params.append(k + " must be an integer")
         if k in type_float and type(v) is not float:
             bad_params.append(k + " must be a float")
-        if k in type_datetime and type(v) is not datetime:
-            bad_params.append(k + " must be in datetime ISO format")
         if k in type_string and type(v) is not str:
             bad_params.append(k + " must be text")
+        
+        # check values
         if k == 'CntDir' and v not in cnt_dir:
             bad_params.append(k + " must be one of " + ", ".join(cnt_dir))
         if k == 'Axle' and v not in axle:
@@ -77,9 +116,18 @@ def check_params(params):
         if k == 'Co_name' and v not in counties:
             bad_params.append(k + " must be one of " + ", ".join(counties))
 
-        # Other checks would go here (Mun_name, etc.)
+        # check SETDate
+        # since all values in sample had no time values, just require date in format YYYY-MM-DD,
+        # and then convert to datetime when inserting/updating
+        if k == 'SETDate':
+            try:
+                datetime.datetime.strptime(v, "%Y-%m-%d")
+            except ValueError:
+                bad_params.append(k + " must be in the format 'YYYY-MM-DD")
 
-    return bad_params, unknown_params
+        # Other checks would go here (Mun_name, against allowed value for facilities, etc.)
+
+    return unknown_params, bad_params
 
 
 sql_query = ("SELECT b.*, w.prcp, w.tavg, w.tmax, w.tmin FROM bicycle_count b LEFT JOIN weather "
@@ -121,7 +169,14 @@ def count(record_num, sql_query=sql_query):
             return jsonify({"error": "Error(s) in submitted parameters: "
                             + "; ".join(bad_params)}), 400
 
-        return "No errors"
+        try:
+            count = BicycleCount.query.filter_by(RecordNum=record_num).one()
+        except NoResultFound:
+            return jsonify({"error": "No matching record found."}), 404
+        
+        # update fields
+        return "Update here"
+
 
     if request.method == 'DELETE':
         try:
@@ -182,9 +237,43 @@ def counts(sql_query=sql_query):
             return jsonify({"error": "No matching records found."}), 404
 
     if request.method == 'POST':
-        pass
+        if not request.data:
+            return jsonify({"error": "No Request body submitted"}), 400
 
-    return
+        if not request.is_json:
+            return jsonify({"error": "Request body must be submitted in json format"}), 400
+
+        # get user-submitted parameters (body)
+        params = request.get_json()
+
+        if not params:
+            return jsonify({"error": "No parameters submitted."}), 400
+
+        missing_params = check_required_fields(params)
+        unknown_params, bad_params = check_params(params)
+
+        if missing_params:
+            return jsonify({"error": "Missing required parameters: "
+                            + ", ".join(missing_params)}), 400
+        if unknown_params:
+            return jsonify({"error": "Unknown parameter(s) submitted: "
+                            + ", ".join(unknown_params)}), 400
+
+        if bad_params:
+            return jsonify({"error": "Error(s) in submitted parameters: "
+                            + "; ".join(bad_params)}), 400
+
+        # insert into db
+        # process a few special params
+        params["SETDate"] = datetime.datetime.strptime(params["SETDate"], "%Y-%m-%d")
+        params["Updated"] = datetime.datetime.now(datetime.timezone.utc)
+        params["GlobalID"] = uuid.uuid4().hex  # ideally, this would check against existing GlobalIDs
+
+        db.session.add(BicycleCount(**params))
+        db.session.commit()
+
+        return jsonify({"Success"})
+        
 
 
 @api_bp.route("facilities", methods=['GET'])

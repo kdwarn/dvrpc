@@ -8,7 +8,7 @@ class BicycleCount(db.Model):
     SETDate = db.Column(db.DateTime)
     SETYear = db.Column(db.Integer)
     Comments = db.Column(db.Text)
-    MCD = db.Column(db.Integer)
+    MCD = db.Column(db.BigInteger)
     Route = db.Column(db.Integer)
     Road = db.Column(db.Text)
     CntDir = db.Column(db.String(4))
