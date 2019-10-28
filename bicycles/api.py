@@ -22,13 +22,16 @@ def alchemyencoder(obj):
 
 
 def check_params(params):
-    # list of fields in database
+    '''
+    Check user-submitted parameters, in PUT and POST requests, against allowed parameters,
+    type of parameters, and allowed content of parameters.
+    '''
     table = inspect(BicycleCount)
     field_names = [field.name for field in table.c]
 
-    # check for unknown parameters, parameter type, parameter content
     unknown_params = []
     bad_params = []
+
     type_int = ['ObjectID', 'SETYear', 'MCD', 'Route', 'Factor', 'AADB']
     type_float = ['X', 'Y', 'Latitude', 'Longitude']
     type_datetime = ['SETDate', 'Updated']
@@ -121,7 +124,15 @@ def count(record_num, sql_query=sql_query):
         return "No errors"
 
     if request.method == 'DELETE':
-        pass
+        try:
+            result = BicycleCount.query.filter_by(RecordNum=int(record_num)).one()
+        except NoResultFound:
+            return jsonify({"error": "No count found with RecordNum " + record_num}), 404
+
+        BicycleCount.query.filter_by(RecordNum=int(record_num)).delete()
+        db.session.commit()
+
+        return jsonify({"Success": "Count with RecordNum " + record_num + " deleted."})
 
     return
 
