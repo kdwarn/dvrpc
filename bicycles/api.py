@@ -30,7 +30,6 @@ def check_required_fields(params):
                        'Y',
                        'ObjectID',
                        'SETDate',
-                       'SETYear',
                        'MCD',
                        'Road',
                        'CntDir',
@@ -68,7 +67,7 @@ def check_params(params):
     unknown_params = []
     bad_params = []
 
-    type_int = ['ObjectID', 'SETYear', 'MCD', 'Route', 'Factor', 'AADB']
+    type_int = ['ObjectID', 'MCD', 'Route', 'Factor', 'AADB']
     type_float = ['X', 'Y', 'Latitude', 'Longitude']
     type_string = ['Road',
                    'FromLmt',
@@ -266,13 +265,14 @@ def counts(sql_query=sql_query):
         # insert into db
         # process a few special params
         params["SETDate"] = datetime.datetime.strptime(params["SETDate"], "%Y-%m-%d")
+        params["SETYear"] = params["SETDate"].year
         params["Updated"] = datetime.datetime.now(datetime.timezone.utc)
-        params["GlobalID"] = uuid.uuid4().hex  # ideally, this would check against existing GlobalIDs
+        params["GlobalID"] = str(uuid.uuid4())  # ideally, this would check against existing GlobalIDs
 
         db.session.add(BicycleCount(**params))
         db.session.commit()
 
-        return jsonify({"Success": "New count inserted."})
+        return jsonify({"Success": "New count inserted."}), 201
         
 
 
