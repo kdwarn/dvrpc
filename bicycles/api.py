@@ -3,7 +3,7 @@ import datetime
 import decimal
 import uuid
 
-from flask import request, Blueprint, Response, jsonify
+from flask import request, Blueprint, Response, jsonify, make_response, url_for
 from sqlalchemy import text
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.inspection import inspect
@@ -269,12 +269,18 @@ def counts(sql_query=sql_query):
         params["Updated"] = datetime.datetime.now(datetime.timezone.utc)
         params["GlobalID"] = str(uuid.uuid4())  # ideally, this would check against existing GlobalIDs
 
-        db.session.add(BicycleCount(**params))
+        count = BicycleCount(**params)
+
+        db.session.add(count)
         db.session.commit()
 
-        return jsonify({"Success": "New count inserted."}), 201
+        # get location of created resource (url_root[:-1] removes duplicate "/")
+        location = request.url_root[:-1] + url_for('api.count', record_num=count.RecordNum)
         
-
+        response = make_response({"Success": "true"}, 201)
+        response.headers['Location'] = location
+        return response
+        
 
 @api_bp.route("facilities", methods=['GET'])
 def facilities():
