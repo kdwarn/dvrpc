@@ -142,10 +142,11 @@ def count(record_num, sql_query=sql_query):
     try:
         record_num = int(record_num)
     except ValueError:
-        return jsonify({"error": f"{record_num} is not a valid recordnum"})
+        return jsonify({"error": f"{record_num} is not a valid recordnum"}), 400
 
     if request.method == 'GET':
         sql_query += " WHERE recordnum = :record_num"
+        
         result = db.session.execute(text(sql_query), {"record_num": record_num}).fetchall()
         if len(result):
             serialized = json.dumps([dict(r) for r in result], default=alchemyencoder)
@@ -196,8 +197,8 @@ def count(record_num, sql_query=sql_query):
         except NoResultFound:
             return jsonify({"error": "No matching record found."}), 404
         except MultipleResultsFound:
-            return jsonify({"error": "More than one record found. There are mutliple records with"
-                            " with the same PRIMARY KEY"}), 500
+            return jsonify({"error": "More than one record found. There are mutliple records with "
+                            "the same PRIMARY KEY"}), 500
         
         # set Updated
         params["updated"] = datetime.datetime.now(datetime.timezone.utc)
@@ -230,8 +231,8 @@ def count(record_num, sql_query=sql_query):
         except NoResultFound:
             return jsonify({"error": "No matching record found."}), 404
         except MultipleResultsFound:
-            return jsonify({"error": "More than one record found. There are mutliple records with"
-                            " with the same PRIMARY KEY"}), 500
+            return jsonify({"error": "More than one record found. There are mutliple records with "
+                            "the same PRIMARY KEY"}), 500
 
         BicycleCount.query.filter_by(recordnum=record_num).delete()
         db.session.commit()
