@@ -3,7 +3,7 @@ import pytest
 
 def test_facilities1(flask_client):
     response = flask_client.get("/api/facilities")
-    json_data = response.get_json() 
+    json_data = response.get_json()
     assert json_data[0] == "Mixed Traffic"
 
 

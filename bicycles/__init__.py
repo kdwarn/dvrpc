@@ -5,6 +5,7 @@ from config import ProductionConfig
 
 db = SQLAlchemy()
 
+
 def create_app(config_class=ProductionConfig):
     app = Flask(__name__)
     app.config.from_object(config_class)

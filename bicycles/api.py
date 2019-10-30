@@ -207,7 +207,7 @@ def count(record_num, sql_query=sql_query):
         db.session.commit()
 
         # update geom, if either lat or lon submitted
-        if params["latitude"] or params["longitude"]:
+        if params.get("latitude") or params.get("longitude"):
             count = BicycleCount.query.filter_by(recordnum=record_num).one()
             sql_query = f'''
                 UPDATE bicycle_count
