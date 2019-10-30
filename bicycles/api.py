@@ -138,9 +138,15 @@ sql_query = ("SELECT b.*, w.prcp, w.tavg, w.tmax, w.tmin FROM bicycle_count b LE
 @api_bp.route("counts/<record_num>", methods=['GET', 'PUT', 'DELETE'])
 def count(record_num, sql_query=sql_query):
     '''Get, edit, or delete one bicycle count record.'''
+    # ensure record_num is an int
+    try:
+        record_num = int(record_num)
+    except ValueError:
+        return jsonify({"error": f"{record_num} is not a valid recordnum"})
+
     if request.method == 'GET':
-        sql_query += " WHERE recordnum = " + record_num
-        result = db.session.execute(text(sql_query)).fetchall()
+        sql_query += " WHERE recordnum = :record_num"
+        result = db.session.execute(text(sql_query), {"record_num": record_num}).fetchall()
         if len(result):
             serialized = json.dumps([dict(r) for r in result], default=alchemyencoder)
             return Response(serialized, mimetype='application/json')
@@ -210,14 +216,14 @@ def count(record_num, sql_query=sql_query):
 
     if request.method == 'DELETE':
         try:
-            result = BicycleCount.query.filter_by(recordnum=int(record_num)).one()
+            result = BicycleCount.query.filter_by(recordnum=record_num).one()
         except NoResultFound:
-            return jsonify({"error": "No count found with recordnum " + record_num}), 404
+            return jsonify({"error": "No matching record found."}), 404
         except MultipleResultsFound:
             return jsonify({"error": "More than one record found. There are mutliple records with"
                             " with the same PRIMARY KEY"}), 500
 
-        BicycleCount.query.filter_by(recordnum=int(record_num)).delete()
+        BicycleCount.query.filter_by(recordnum=record_num).delete()
         db.session.commit()
 
         return jsonify({"Success": "Count with recordnum " + record_num + " deleted."})
@@ -325,16 +331,29 @@ def closest(sql_query=sql_query):
     if request.method == 'GET':
         lon = request.args.get("lon")
         lat = request.args.get("lat")
-        
+
         if not lat or not lon:
             return jsonify({"error": "You must supply a longitude and a latitude."}), 400
+
+        # ensure they are floats
+        try:
+            lon = float(lon)
+        except ValueError:
+            return jsonify({"error": f"{lon} is not a valid longitude"})
         
+        try:
+            lat = float(lat)
+        except ValueError:
+            return jsonify({"error": f"{lat} is not a valid longitude"})
+
+        
+
         sql_query += f'''
             ORDER BY
             b.geom <->'SRID=4326;POINT({lon} {lat})'::geometry
             LIMIT 5;
             '''
-
+        
         result = db.session.execute(text(sql_query)).fetchall()
 
         if len(result):
