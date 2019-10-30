@@ -213,7 +213,6 @@ def count(record_num, sql_query=sql_query):
         response.headers['Location'] = location
         return response
 
-
     if request.method == 'DELETE':
         try:
             result = BicycleCount.query.filter_by(recordnum=record_num).one()
@@ -311,12 +310,21 @@ def counts(sql_query=sql_query):
         params["setyear"] = params["setdate"].year
         params["updated"] = datetime.datetime.now(datetime.timezone.utc)
         params["globalid"] = str(uuid.uuid4())  # ideally, this would check against existing GlobalIDs
-
+        
         count = BicycleCount(**params)
 
         db.session.add(count)
         db.session.commit()
 
+        # add the geom field
+        sql_query = f'''
+            UPDATE bicycle_count
+            SET geom = ST_SetSRID(ST_MakePoint({params["longitude"]}, {params["latitude"]}), 4326)
+            WHERE recordnum = {count.recordnum}
+            '''
+        db.session.execute(text(sql_query))
+        db.session.commit()
+        
         # get location of created resource (url_root[:-1] removes duplicate "/")
         location = request.url_root[:-1] + url_for('api.count', record_num=count.recordnum)
         
