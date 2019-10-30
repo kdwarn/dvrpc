@@ -226,7 +226,7 @@ def count(record_num, sql_query=sql_query):
         BicycleCount.query.filter_by(recordnum=record_num).delete()
         db.session.commit()
 
-        return jsonify({"Success": "Count with recordnum " + record_num + " deleted."})
+        return jsonify({"Success": "Count with recordnum " + str(record_num) + " deleted."})
 
     return
 
