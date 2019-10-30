@@ -29,6 +29,7 @@ class BicycleCount(db.Model):
     program = db.Column(db.Text, nullable=False, default='')
     bikepedgro = db.Column(db.Text)
     bikepedfac = db.Column(db.Text, nullable=False, default='')
+    geom = db.Column(db.Text)
 
 
 class Weather(db.Model):
