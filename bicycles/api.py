@@ -206,6 +206,17 @@ def count(record_num, sql_query=sql_query):
         count.update(params)
         db.session.commit()
 
+        # update geom, if either lat or lon submitted
+        if params["latitude"] or params["longitude"]:
+            count = BicycleCount.query.filter_by(recordnum=record_num).one()
+            sql_query = f'''
+                UPDATE bicycle_count
+                SET geom = ST_SetSRID(ST_MakePoint({count.longitude}, {count.latitude}), 4326)
+                WHERE recordnum = {count.recordnum}
+                '''
+            db.session.execute(text(sql_query))
+            db.session.commit()
+
         # get location of updated resource (url_root[:-1] removes duplicate "/")
         location = request.url_root[:-1] + url_for('api.count', record_num=record_num)
         
@@ -353,8 +364,6 @@ def closest(sql_query=sql_query):
             lat = float(lat)
         except ValueError:
             return jsonify({"error": f"{lat} is not a valid longitude"})
-
-        
 
         sql_query += f'''
             ORDER BY
