@@ -1,6 +1,6 @@
-# mysql -u <username> -p dvrpc < data/create_tables.sql  
+/* mysql -u <username> -p dvrpc < data/create_tables.sql  
 # used DECIMAL(10,6) for x/y and lon/lat, because that is accurate to 11.1 cm
-# https://gis.stackexchange.com/questions/8650/measuring-accuracy-of-latitude-and-longitude
+# https://gis.stackexchange.com/questions/8650/measuring-accuracy-of-latitude-and-longitude */
 
 
 CREATE TABLE bicycle_count (
