@@ -106,7 +106,7 @@ def check_params(params):
             bad_params.append(k + " must be a float")
         if k in type_string and type(v) is not str:
             bad_params.append(k + " must be text")
-        
+
         # check values
         if k == 'cntdir' and v not in cnt_dir:
             bad_params.append(k + " must be one of " + ", ".join(cnt_dir))
