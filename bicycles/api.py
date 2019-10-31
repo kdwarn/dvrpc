@@ -239,8 +239,6 @@ def count(record_num, sql_query=sql_query):
 
         return jsonify({"Success": "Count with recordnum " + str(record_num) + " deleted."})
 
-    return
-
 
 @api_bp.route("counts", methods=['GET', 'POST'])
 def counts(sql_query=sql_query):

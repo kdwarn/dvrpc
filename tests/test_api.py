@@ -182,6 +182,14 @@ def test_check_params_all_good(params):
     unknown_params, bad_params = api.check_params(params)
     assert len(bad_params) == 0
 
+
+def test_check_optional_params():
+    assert False
+
+
+def test_check_null_params():
+    assert False
+
 ###########
 # count() #
 ###########
@@ -226,10 +234,22 @@ def test_count_get_returns_404_if_no_matching_recordnum(flask_client):
 
 
 
+# delete
 
 
+def test_count_delete_is_successful(flask_client):
+    delete_response = flask_client.delete("/api/counts/140313")
+    delete_status_code = delete_response.status_code
+    get_response = flask_client.get("/api/counts")
+    json_data = get_response.get_json()
+    assert delete_status_code == 200 and len(json_data) == 9
 
-    
+
+def test_count_delete_returns_404_if_no_matching_recordnum(flask_client):
+    response = flask_client.delete("/api/counts/1")
+    json_data = response.get_json()
+    assert response.status_code == 404 and json_data["error"] == "No matching record found."
+
 
 ############
 # counts() #
