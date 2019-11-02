@@ -12,11 +12,13 @@ def create_app(config_class=ProductionConfig):
     db.init_app(app)
 
     # import blueprints
-    from .api import api_bp
     from .main import main_bp
+    from .api import api_bp
+    from .doc import doc_bp
 
     # register blueprints
-    app.register_blueprint(api_bp, url_prefix="/api")
     app.register_blueprint(main_bp, url_prefix="")
+    app.register_blueprint(api_bp, url_prefix="/api")
+    app.register_blueprint(doc_bp, url_prefix="/api/documentation")
 
     return app

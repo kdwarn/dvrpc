@@ -25,28 +25,29 @@ def alchemyencoder(obj):
 
 def check_required_fields(params):
     '''When creating a new count, check params submitted against required fields.'''
-    # assumed required_params based on sample of counts without missing values, excluding
-    # "RecordNum", "Updated", and "GlobalID"
-    required_fields = ['x',
-                       'y',
-                       'objectid',
-                       'setdate',
-                       'mcd',
-                       'road',
-                       'cntdir',
-                       'fromlmt',
-                       'tolmt',
-                       'type',
-                       'latitude',
-                       'longitude',
-                       'factor',
-                       'axle',
-                       'outdir',
-                       'indir',
-                       'aadb',
-                       'co_name',
-                       'mun_name',
-                       'bikepedgro',
+
+    # required fields for creating new count
+    required_fields = [
+        'x',
+        'y',
+        'objectid',
+        'setdate',
+        'mcd',
+        'road',
+        'cntdir',
+        'fromlmt',
+        'tolmt',
+        'type',
+        'latitude',
+        'longitude',
+        'factor',
+        'axle',
+        'outdir',
+        'indir',
+        'aadb',
+        'co_name',
+        'mun_name',
+        'bikepedgro',
     ]
 
     missing_params = []
@@ -63,6 +64,7 @@ def check_params(params):
     Check user-submitted parameters, in PUT and POST requests, against allowed parameters,
     type of parameters, and allowed content of parameters.
     '''
+    # get field names from db, to check for unknown parameters submitted
     table = inspect(BicycleCount)
     field_names = [field.name for field in table.c]
 
@@ -71,27 +73,29 @@ def check_params(params):
 
     type_int = ['objectid', 'mcd', 'route', 'factor', 'aadb']
     type_float = ['x', 'y', 'latitude', 'longitude']
-    type_string = ['road',
-                   'fromlmt',
-                   'tolmt',
-                   'type',
-                   'mun_name',
-                   'program',
-                   'bikepedgro',
-                   'bikepedfac',
+    type_string = [
+        'road',
+        'fromlmt',
+        'tolmt',
+        'type',
+        'mun_name',
+        'program',
+        'bikepedgro',
+        'bikepedfac',
     ]
     cnt_dir = ['both', 'east', 'west', 'north', 'south']
     axle = [0, 1, 1.02]
     in_out_dir = ['E', 'W', 'N', 'S']
-    counties = ['Bucks',
-                'Chester',
-                'Delaware',
-                'Montgomery',
-                'Philadelphia',
-                'Burlington',
-                'Camden',
-                'Gloucester',
-                'Mercer',
+    counties = [
+        'Bucks',
+        'Chester',
+        'Delaware',
+        'Montgomery',
+        'Philadelphia',
+        'Burlington',
+        'Camden',
+        'Gloucester',
+        'Mercer',
     ]
 
     # check for unknown parameters and parameter type/content
@@ -165,7 +169,7 @@ def count(record_num, sql_query=sql_query):
         try:
             params = request.get_json()
         except BadRequest:
-            return jsonify({"error": "Unable to process submitted JSON content."})
+            return jsonify({"error": "Unable to process submitted JSON content."}), 400
         
         if not params:
             return jsonify({"error": "No parameters submitted."}), 400
@@ -245,18 +249,18 @@ def counts(sql_query=sql_query):
     '''Return all bicycle counts according to various criteria or add new bicycle count record.'''
     if request.method == 'GET':
         bikepedfac = request.args.get("bikepedfac")
-        precipitation = request.args.get("precipitation")
+        prcp = request.args.get("prcp")
         
         where_clauses = []
 
-        if precipitation:
+        if prcp:
             try:
-                precipitation = float(precipitation)
+                prcp = float(prcp)
             except ValueError:
                 return jsonify({'error': 'Precipitation value must be an number, with optional '
                                 'decimal points.'}), 400
             
-            where_clauses.append(f"w.prcp >= {precipitation}")
+            where_clauses.append(f"w.prcp >= {prcp}")
         
         if bikepedfac:
             facility_types = ['Multiuse Trail',
@@ -295,7 +299,7 @@ def counts(sql_query=sql_query):
         try:
             params = request.get_json()
         except BadRequest:
-            return jsonify({"error": "Unable to process submitted JSON content."})
+            return jsonify({"error": "Unable to process submitted JSON content."}), 400
 
         if not params:
             return jsonify({"error": "No parameters submitted."}), 400
@@ -357,12 +361,12 @@ def closest(sql_query=sql_query):
         try:
             lon = float(lon)
         except ValueError:
-            return jsonify({"error": f"{lon} is not a valid longitude"})
+            return jsonify({"error": f"{lon} is not a valid longitude"}), 400
         
         try:
             lat = float(lat)
         except ValueError:
-            return jsonify({"error": f"{lat} is not a valid longitude"})
+            return jsonify({"error": f"{lat} is not a valid longitude"}), 400
 
         sql_query += f'''
             ORDER BY

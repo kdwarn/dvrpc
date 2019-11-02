@@ -1,0 +1,87 @@
+<html>
+<head>
+  <style>
+  body {
+    margin: 25px 50px 25px 50px;
+    color: #2E2E2E;
+  }
+  h3 {
+    background-color: #D8D8D8;
+    padding: 2px;
+    padding-left: 5px;
+  }
+  .GET {
+    color: #1391FF;
+  }
+  .PUT {
+    color: #E97500;
+  }
+  .POST {
+    color: #009D77;
+  }
+  .DELETE {
+    color: #CF3030;
+  }
+  #method_info {
+    padding-left: 20px;
+  }
+  .bold {
+    font-weight: bold;
+  }
+  .italics {
+    font-style: italic;
+  }
+  </style>
+
+</head>
+
+<body>
+  <h1>DVRPC Bicycle Count API</h1>
+  <h2>Introduction</h2>
+    <p>{{intro['top']}}</p>
+    <p>
+      {% for k,v in intro['responses'].items() %}
+        <ul>
+          <li>{{k}} - {{v}}</li>
+        </ul>  
+      {% endfor %}
+    </p>
+    <p>{{intro['bottom']}}</p>
+    <br>
+  <h2>Endpoints</h2>
+    {% for endpoint in endpoints %}
+      <h3>{{endpoint.url}}</h3>
+      {% for method in endpoint.methods %}
+        <span class="{{method.name}} bold">{{method.name}}</span>
+         - <span class="italics">{{method.description}}</span><br><br>
+        <div id="method_info">
+        REQUEST PARAMETERS:<br>
+        {% if not method.parameters %}
+          <ul><li>None</li></ul>
+        {% else %}
+          <ul>
+          {% for param in method.parameters %}
+            <li>
+              {{param.name}}
+              {% if param.required == True %}
+                <span style="color:red">(required)</span>
+              {% endif %}
+              <ul>
+                <li>Location: {{param.type}}</li>
+                <li>Type of content: {{param.content}}</li>
+              </ul>
+            </li>
+          {% endfor %}
+          </ul>
+        {% endif %}
+        RESPONSES:<br>
+        <ul>
+          {% for response in method.responses: %}
+          <li>{{response.status_code}} {{response.short_name}} - {{response.description}}</li>
+          {% endfor %}
+        </ul>
+        </div>
+      {% endfor %}
+    {% endfor %}  
+</body>
+</html>
