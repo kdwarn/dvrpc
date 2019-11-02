@@ -16,7 +16,7 @@ def documentation():
 
     intro['responses'] = {
         '200': 'OK',
-        '201': 'Item Created',
+        '201': 'Created',
         '400': 'Bad Request',
         '404': 'Not Found',
         '500': 'Internal Server Error',
@@ -43,19 +43,16 @@ def documentation():
                     ],
                     'responses': [
                         {
-                            'status_code': '200',
-                            'short_name': 'OK',
-                            'description': "Success"
+                            'status_code': '200 OK',
+                            'description': 'Success',
                         },
                         {
-                            'status_code': '400',
-                            'short_name': 'Bad Request',
-                            'description': "Provided <recordnum> is not an Integer"
+                            'status_code': '400 Bad Request',
+                            'description': 'Provided recordnum is not an Integer',
                         },
                         {
-                            'status_code': '404',
-                            'short_name': 'Not Found',
-                            'description': "No count with provided <recordnum> found"
+                            'status_code': '404 Not Found',
+                            'description': 'No count with provided recordnum found',
                         },
 
                     ]
@@ -71,10 +68,202 @@ def documentation():
                             'content': 'Integer',
                         },
                         {
-                            'name': '',
-                            'type': 'query string',
+                            'name': 'x',
+                            'type': 'body',
                             'required': False,
-                            'content': '',
+                            'content': 'Float',
+                        },
+                        {
+                            'name': 'y',
+                            'type': 'body',
+                            'required': False,
+                            'content': 'Float',
+                        },
+                        {
+                            'name': 'objectid',
+                            'type': 'body',
+                            'required': False,
+                            'content': 'Integer',
+                        },
+                        {
+                            'name': 'setdate',
+                            'type': 'body',
+                            'required': False,
+                            'content': 'Date, in format YYYY-MM-DD',
+                        },
+                        {
+                            'name': 'comments',
+                            'type': 'body',
+                            'required': False,
+                            'content': 'String',
+                        },
+                        {
+                            'name': 'mcd',
+                            'type': 'body',
+                            'required': False,
+                            'content': 'Integer',
+                        },
+                        {
+                            'name': 'route',
+                            'type': 'body',
+                            'required': False,
+                            'content': 'Integer',
+                        },
+                        {
+                            'name': 'road',
+                            'type': 'body',
+                            'required': False,
+                            'content': 'String',
+                        },
+                        {
+                            'name': 'cntdir',
+                            'type': 'body',
+                            'required': False,
+                            'content': 'String',
+                            'possible_values': [
+                                'both',
+                                'east',
+                                'west',
+                                'north',
+                                'south',
+                            ],
+                        },
+                        {
+                            'name': 'fromlmt',
+                            'type': 'body',
+                            'required': False,
+                            'content': 'String',
+                        },
+                        {
+                            'name': 'tolmt',
+                            'type': 'body',
+                            'required': False,
+                            'content': 'String',
+                        },
+                        {
+                            'name': 'type',
+                            'type': 'body',
+                            'required': False,
+                            'content': 'String',
+                        },
+                        {
+                            'name': 'latitude',
+                            'type': 'body',
+                            'required': False,
+                            'content': 'Float',
+                        },
+                        {
+                            'name': 'longitude',
+                            'type': 'body',
+                            'required': False,
+                            'content': 'Float',
+                        },
+                        {
+                            'name': 'factor',
+                            'type': 'body',
+                            'required': False,
+                            'content': 'Integer',
+                        },
+                        {
+                            'name': 'axle',
+                            'type': 'body',
+                            'required': False,
+                            'content': 'Integer or Float',
+                            'possible_values': [
+                                0,
+                                1,
+                                1.02,
+                            ],
+                        },
+                        {
+                            'name': 'outdir',
+                            'type': 'body',
+                            'required': False,
+                            'content': 'String',
+                            'possible_values': [
+                                'E',
+                                'W',
+                                'N',
+                                'S',
+                            ],
+                        },
+                        {
+                            'name': 'indir',
+                            'type': 'body',
+                            'required': False,
+                            'content': 'String',
+                            'possible_values': [
+                                'E',
+                                'W',
+                                'N',
+                                'S',
+                            ],
+                        },
+                        {
+                            'name': 'aadb',
+                            'type': 'body',
+                            'required': False,
+                            'content': 'Integer',
+                        },
+                        {
+                            'name': 'co_name',
+                            'type': 'body',
+                            'required': False,
+                            'content': 'String',
+                            'possible_values': [
+                                'Bucks',
+                                'Chester',
+                                'Delaware',
+                                'Montgomery',
+                                'Philadelphia',
+                                'Burlington',
+                                'Camden',
+                                'Gloucester',
+                                'Mercer',
+                            ],
+                        },
+                        {
+                            'name': 'mun_name',
+                            'type': 'body',
+                            'required': False,
+                            'content': 'String',
+                        },
+                        {
+                            'name': 'program',
+                            'type': 'body',
+                            'required': False,
+                            'content': 'String',
+                        },
+                        {
+                            'name': 'bikepedgro',
+                            'type': 'body',
+                            'required': False,
+                            'content': 'String',
+                        },
+                        {
+                            'name': 'bikepedfac',
+                            'type': 'body',
+                            'required': False,
+                            'content': 'String',
+                        },
+                    ],
+                    'responses': [
+                        {
+                            'status_code': '200 OK',
+                            'description': 'Success',
+                        },
+                        {
+                            'status_code': '400 Bad Request',
+                            'description': 'Error in submitted parameters. A message detailing '
+                                           'the problems will be provided',
+                        },
+                        {
+                            'status_code': '404 Not Found',
+                            'description': 'No count with provided recordnum found',
+                        },
+                        {
+                            'status_code': '500 Internal Server Error',
+                            'description': 'An error ocurred on the server',
                         },
                     ],
                 },
@@ -87,6 +276,24 @@ def documentation():
                             'type': 'path',
                             'required': True,
                             'content': 'Integer',
+                        },
+                    ],
+                    'responses': [
+                        {
+                            'status_code': '200 OK',
+                            'description': 'Success',
+                        },
+                        {
+                            'status_code': '400 Bad Request',
+                            'description': 'Provided recordnum is not an Integer',
+                        },
+                        {
+                            'status_code': '404 Not Found',
+                            'description': 'No count with provided recordnum found',
+                        },
+                        {
+                            'status_code': '500 Internal Server Error',
+                            'description': 'An error ocurred on the server',
                         },
                     ],
                 },
@@ -113,12 +320,219 @@ def documentation():
                             'required': False,
                             'content': "Integer or Float"
                         }
-                    ]
+                    ],
+                    'responses': [
+                        {
+                            'status_code': '200 OK',
+                            'description': 'Success',
+                        },
+                        {
+                            'status_code': '400 Bad Request',
+                            'description': 'Error in submitted parameters. A message detailing '
+                                           'the problems will be provided',
+                        },
+                        {
+                            'status_code': '404 Not Found',
+                            'description': 'No counts with provided criteria found',
+                        },
+                    ],
                 },
                 {
                     'name': 'POST',
                     'description': 'Create new count',
-                }
+                    'parameters': [
+                        {
+                            'name': 'x',
+                            'type': 'body',
+                            'required': True,
+                            'content': 'Float',
+                        },
+                        {
+                            'name': 'y',
+                            'type': 'body',
+                            'required': True,
+                            'content': 'Float',
+                        },
+                        {
+                            'name': 'objectid',
+                            'type': 'body',
+                            'required': True,
+                            'content': 'Integer',
+                        },
+                        {
+                            'name': 'setdate',
+                            'type': 'body',
+                            'required': True,
+                            'content': 'Date, in format YYYY-MM-DD',
+                        },
+                        {
+                            'name': 'comments',
+                            'type': 'body',
+                            'required': False,
+                            'content': 'String',
+                        },
+                        {
+                            'name': 'mcd',
+                            'type': 'body',
+                            'required': True,
+                            'content': 'Integer',
+                        },
+                        {
+                            'name': 'route',
+                            'type': 'body',
+                            'required': False,
+                            'content': 'Integer',
+                        },
+                        {
+                            'name': 'road',
+                            'type': 'body',
+                            'required': True,
+                            'content': 'String',
+                        },
+                        {
+                            'name': 'cntdir',
+                            'type': 'body',
+                            'required': True,
+                            'content': 'String',
+                            'possible_values': [
+                                'both',
+                                'east',
+                                'west',
+                                'north',
+                                'south',
+                            ],
+                        },
+                        {
+                            'name': 'fromlmt',
+                            'type': 'body',
+                            'required': True,
+                            'content': 'String',
+                        },
+                        {
+                            'name': 'tolmt',
+                            'type': 'body',
+                            'required': True,
+                            'content': 'String',
+                        },
+                        {
+                            'name': 'type',
+                            'type': 'body',
+                            'required': True,
+                            'content': 'String',
+                        },
+                        {
+                            'name': 'latitude',
+                            'type': 'body',
+                            'required': True,
+                            'content': 'Float',
+                        },
+                        {
+                            'name': 'longitude',
+                            'type': 'body',
+                            'required': True,
+                            'content': 'Float',
+                        },
+                        {
+                            'name': 'factor',
+                            'type': 'body',
+                            'required': True,
+                            'content': 'Integer',
+                        },
+                        {
+                            'name': 'axle',
+                            'type': 'body',
+                            'required': True,
+                            'content': 'Integer or Float',
+                            'possible_values': [
+                                0,
+                                1,
+                                1.02
+                            ],
+                        },
+                        {
+                            'name': 'outdir',
+                            'type': 'body',
+                            'required': True,
+                            'content': 'String',
+                            'possible_values': [
+                                'E',
+                                'W',
+                                'N',
+                                'S',
+                            ],
+                        },
+                        {
+                            'name': 'indir',
+                            'type': 'body',
+                            'required': True,
+                            'content': 'String',
+                            'possible_values': [
+                                'E',
+                                'W',
+                                'N',
+                                'S',
+                            ],
+                        },
+                        {
+                            'name': 'aadb',
+                            'type': 'body',
+                            'required': True,
+                            'content': 'Integer',
+                        },
+                        {
+                            'name': 'co_name',
+                            'type': 'body',
+                            'required': True,
+                            'content': 'String',
+                            'possible_values': [
+                                'Bucks',
+                                'Chester',
+                                'Delaware',
+                                'Montgomery',
+                                'Philadelphia',
+                                'Burlington',
+                                'Camden',
+                                'Gloucester',
+                                'Mercer',
+                            ],
+                        },
+                        {
+                            'name': 'mun_name',
+                            'type': 'body',
+                            'required': True,
+                            'content': 'String',
+                        },
+                        {
+                            'name': 'program',
+                            'type': 'body',
+                            'required': False,
+                            'content': 'String',
+                        },
+                        {
+                            'name': 'bikepedgro',
+                            'type': 'body',
+                            'required': True,
+                            'content': 'String',
+                        },
+                        {
+                            'name': 'bikepedfac',
+                            'type': 'body',
+                            'required': False,
+                            'content': 'String',
+                        },
+                    ],
+                    'responses': [
+                        {
+                            'status_code': '201 Created',
+                            'description': 'Success',
+                        },
+                        {
+                            'status_code': '400 Bad Request',
+                            'description': 'Error in submitted parameters. A message detailing '
+                                           'the problems will be provided',
+                        },
+                    ],
+                },
             ],
         },
         {
@@ -140,7 +554,22 @@ def documentation():
                             'required': True,
                             'content': "Float",
                         }
-                    ]
+                    ],
+                    'responses': [
+                        {
+                            'status_code': '200 OK',
+                            'description': 'Success',
+                        },
+                        {
+                            'status_code': '400 Bad Request',
+                            'description': 'Values for latitude and/or longitude not provided or '
+                                           'values provided are not Floats',
+                        },
+                        {
+                            'status_code': '404 Not Found',
+                            'description': 'No counts found',
+                        },
+                    ],
                 },
             ],
         },
@@ -150,6 +579,16 @@ def documentation():
                 {
                     'name': 'GET',
                     'description': 'Retrieve all facility types',
+                    'responses': [
+                        {
+                            'status_code': '200 OK',
+                            'description': 'Success',
+                        },
+                        {
+                            'status_code': '404 Not Found',
+                            'description': 'No facilities found',
+                        },
+                    ],
                 },
             ],
         },
