@@ -78,7 +78,7 @@
           {% endfor %}
           </ul>
         {% endif %}
-        RESPONSES:<br>
+        RESPONSE STATUS CODES:<br>
         <ul>
           {% for response in method.responses: %}
           <li>{{response.status_code}} {{response.short_name}} - {{response.description}}</li>
