@@ -49,6 +49,7 @@
     <p>{{intro['bottom']}}</p>
     <br>
   <h2>Endpoints</h2>
+    <p>Base URL: {{base_url}}</p>
     {% for endpoint in endpoints %}
       <h3>{{endpoint.url}}</h3>
       {% for method in endpoint.methods %}

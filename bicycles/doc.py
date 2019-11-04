@@ -24,7 +24,7 @@ def documentation():
 
     intro['bottom'] = "Additional details for Requests and Responses are provided for each Endpoint below."
 
-    base_url = '/api'
+    base_url = 'https://secret-coast-67195.herokuapp.com/api'
 
     endpoints = [
         {
@@ -594,4 +594,4 @@ def documentation():
         },
     ]
 
-    return render_template("documentation.html", intro=intro, endpoints=endpoints)
+    return render_template("documentation.html", base_url=base_url, intro=intro, endpoints=endpoints)
